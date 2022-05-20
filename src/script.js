@@ -1,4 +1,24 @@
 // import adapter from '../node_modules/webrtc-adapter';
+
+let APP_ID="4f13e7ff05ee403b907da0f50bf50bb1";
+
+// authentication.
+// token created from a web app. Deploy your own for production servers
+let token="0064f13e7ff05ee403b907da0f50bf50bb1IAA67WUvSHUxI6VyZ62EAw7EZC/aJIalzaloROcK14nfhAx+f9gAAAAAEADO2X0GBgaJYgEA6AMGBoli";
+
+// userid
+// let uid=String(Math.floor(Math.random()*10000))
+// let uid=(Math.random()*10).toString(16).substring(2,12);
+let uid="test";
+
+
+
+// client object logged in with.
+let client;
+
+// create a channel between the users.
+let channel;
+
 let localStream;
 let remoteStream;
 let peerConnection;
@@ -15,11 +35,30 @@ const servers={
 }
 
 const init=async()=>{
+    // create and return an RTM  client instance.
+    client=await AgoraRTM.createInstance(APP_ID,{enableLogUpload:true});
+    
+    // login auth
+    await client.login({uid,token});
+
+    // room id(channel) e.g index.html?room=1243432
+    channel=client.createChannel("main");
+    
+    // join the channel.
+    await channel.join();
+
+    // event listener that other member joins.
+    channel.on("MemberJoined", handleuserJoined);
+
     localStream= await navigator.mediaDevices.getUserMedia({video:true, audio:true});
     document.getElementById("peer-A").srcObject=localStream;
     createOffer();
 }
 
+
+const handleuserJoined=async(MemberId)=>{
+    console.log(" A new user joined the channel", MemberId);
+}
 // create ICE candidates.
 
 const createOffer=async()=>{
