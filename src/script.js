@@ -1,15 +1,13 @@
 // import AgoraRTM from '../agora-rtm-sdk-1.4.4';
 
-let APP_ID="4f13e7ff05ee403b907da0f50bf50bb1";
+let APP_ID="2058297c5b474d2b9d3b9c2174495cfb";
 
 // authentication.
 // token created from a web app. Deploy your own for production servers
-let token="0064f13e7ff05ee403b907da0f50bf50bb1IAA4JCiR6Imlc6tOOZTyO4O4I9PG0EnHnvJtugoLC7ZJmAx+f9gAAAAAEAALSwH7UQmLYgEA6ANRCYti";
-
+let token=null;
 // userid
-// let uid=String(Math.floor(Math.random()*10000))
+let uid="prajna"+(Math.floor(Math.random()*10000)).toString(16);
 // let uid=(Math.random()*10).toString(16).substring(2,12);
-let uid="test";
 
 
 
@@ -60,9 +58,11 @@ const init=async()=>{
 
     // message from peer. Respond tothe message
     client.on("MessageFromPeer", handleMessageFromPeer);
-    localStream= await navigator.mediaDevices.getUserMedia({video:true, audio:true});
+    localStream= await navigator.mediaDevices.getUserMedia({video:true, audio:false});
     document.getElementById("peer-A").srcObject=localStream;
-    createOffer();
+    console.log(uid);
+
+    
 }
 
 // handle user message sent event.
@@ -73,7 +73,7 @@ const handleMessageFromPeer=async(message, MemberId)=>{
 
 // handle user joined event
 const handleuserJoined=async(MemberId)=>{
-    console.log(" A new user joined the channel", MemberId);
+    console.log(" A new user joined the channel: ", MemberId);
     createOffer(MemberId);
 }
 // create ICE candidates.
@@ -97,7 +97,9 @@ const createPeerConnection=async(MemberId)=>{
     })
     // listen for when our peer adds their tracks too.
     peerConnection.ontrack=(e)=>{
+        console.log("e streams are: ",e.streams)
         e.streams[0].getTracks().forEach((track)=>{
+            
             remoteStream.addTrack(track);
         });
     }
@@ -105,9 +107,9 @@ const createPeerConnection=async(MemberId)=>{
     // create ICE candidates when setLocalDescription is set.
     peerConnection.onicecandidate=async(e)=>{
         if(e.candidate){
-            console.log("New ICE candidate ",e.candidate );
+            // console.log("New ICE candidate ",e.candidate );
             // sendover the ICe candisates
-            // client.sendMessageToPeer({text:JSON.stringify({"type":"candidate", "candidate":e.candidate})},MemberId);
+            client.sendMessageToPeer({text:JSON.stringify({"type":"candidate", "candidate":e.candidate})},MemberId);
         }
     }
 
