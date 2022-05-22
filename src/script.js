@@ -1,5 +1,4 @@
-// import adapter from '../node_modules/webrtc-adapter';
-import AgoraRTM from 'agora-rtm-sdk';
+// import AgoraRTM from '../agora-rtm-sdk-1.4.4';
 
 let APP_ID="4f13e7ff05ee403b907da0f50bf50bb1";
 
