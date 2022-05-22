@@ -4,7 +4,7 @@ let APP_ID="4f13e7ff05ee403b907da0f50bf50bb1";
 
 // authentication.
 // token created from a web app. Deploy your own for production servers
-let token="0064f13e7ff05ee403b907da0f50bf50bb1IAA67WUvSHUxI6VyZ62EAw7EZC/aJIalzaloROcK14nfhAx+f9gAAAAAEADO2X0GBgaJYgEA6AMGBoli";
+let token="0064f13e7ff05ee403b907da0f50bf50bb1IAA4JCiR6Imlc6tOOZTyO4O4I9PG0EnHnvJtugoLC7ZJmAx+f9gAAAAAEAALSwH7UQmLYgEA6ANRCYti";
 
 // userid
 // let uid=String(Math.floor(Math.random()*10000))
@@ -76,7 +76,7 @@ const createOffer=async()=>{
     peerConnection.ontrack=(e)=>{
         e.streams[0].getTracks().forEach((track)=>{
             remoteStream.addTrack(track);
-        })
+        });
     }
 
     // create ICE candidates when setLocalDescription is set.
