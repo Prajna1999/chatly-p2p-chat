@@ -56,8 +56,12 @@ const init=async()=>{
     // event listener that other member joins.
     channel.on("MemberJoined", handleuserJoined);
 
+    // event listener on membeLeft event.
+    channel.on("MemberLeft", handleuserLeft);
+
     // message from peer. Respond tothe message
     client.on("MessageFromPeer", handleMessageFromPeer);
+
     localStream= await navigator.mediaDevices.getUserMedia({video:true, audio:false});
     document.getElementById("peer-A").srcObject=localStream;
     console.log(uid);
@@ -78,7 +82,7 @@ const handleMessageFromPeer=async(message, MemberId)=>{
         addAnswer(message.answer)
     }
 
-    // both peers will send out candidates. add candidate to peer connection.
+    // both peers will send out candidates. add ICEcandidate to peer connection.
     if(message.type==='candidate'){
         if(peerConnection){
             peerConnection.addIceCandidate(message.candidate)
@@ -100,6 +104,7 @@ const createPeerConnection=async(MemberId)=>{
     remoteStream=new MediaStream();
 
     document.getElementById("peer-B").srcObject=remoteStream;
+    document.getElementById("peer-B").style.display="block";
     
     if(!localStream){
         localStream=await navigator.mediaDevices.getUserMedia({video:true, audio:true});
@@ -173,4 +178,16 @@ let addAnswer=async(answer)=>{
         peerConnection.setRemoteDescription(answer);
     }
 }
+
+// handle user left event.
+let handleuserLeft=async(MemberId)=>{
+    document.getElementById('peer-B').style.display="none";
+}
+
+// leave channel logout and leave.
+let leaveChannel=async()=>{
+    await channel.leave();
+    await channel.logout();
+}
+window.addEventListener("beforeunload", leaveChannel);
 init();
