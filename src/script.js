@@ -1,4 +1,6 @@
 // import AgoraRTM from '../agora-rtm-sdk-1.4.4';
+const camera=document.getElementById("cameraBtn");
+const mic=document.getElementById("micBtn");
 
 let APP_ID="2058297c5b474d2b9d3b9c2174495cfb";
 
@@ -41,6 +43,13 @@ const servers={
     ]
 }
 
+const contraints={
+    video:{
+        width:{min:640, ideal:1920, max:1920},
+        height:{min:480, ideal:1920, max:1920}
+    },
+    audio:true
+};
 const init=async()=>{
     // create and return an RTM  client instance.
     client=await AgoraRTM.createInstance(APP_ID,{enableLogUpload:true});
@@ -63,7 +72,7 @@ const init=async()=>{
     // message from peer. Respond tothe message
     client.on("MessageFromPeer", handleMessageFromPeer);
 
-    localStream= await navigator.mediaDevices.getUserMedia({video:true, audio:false});
+    localStream= await navigator.mediaDevices.getUserMedia(contraints);
     document.getElementById("peer-A").srcObject=localStream;
     console.log(uid);
 
@@ -106,6 +115,8 @@ const createPeerConnection=async(MemberId)=>{
 
     document.getElementById("peer-B").srcObject=remoteStream;
     document.getElementById("peer-B").style.display="block";
+
+    document.getElementById("peer-A").classList.add("smallFrame");
     
     if(!localStream){
         localStream=await navigator.mediaDevices.getUserMedia({video:true, audio:true});
@@ -183,12 +194,41 @@ let addAnswer=async(answer)=>{
 // handle user left event.
 let handleuserLeft=async(MemberId)=>{
     document.getElementById('peer-B').style.display="none";
+    document.getElementById("peer-A").classList.remove("smallFrame");
 }
 
 // leave channel logout and leave.
 let leaveChannel=async()=>{
     await channel.leave();
     await channel.logout();
+};
+
+// camera toggle event.
+let toggleCamera=async()=>{
+    const videoTrack=localStream.getTracks().find(track=>track.kind==="video");
+    if(videoTrack.enabled){
+        videoTrack.enabled=false;
+       camera.style.backgroundColor="rgb(255,80,80)";
+    }else{
+        videoTrack.enabled=true;
+        camera.style.backgroundColor="rgb(179,102,249,1)";
+    }
+}
+
+// toggle mic event.
+let toggleMic=async()=>{
+    const audioTrack=localStream.getTracks().find(track=>track.kind==='audio');
+    if(audioTrack.enabled){
+        audioTrack.enabled=false;
+        mic.style.backgroundColor="rgb(255,80,80)";
+        console.log("Muted")
+    }else{
+        audioTrack.enabled=true;
+        mic.style.backgroundColor="rgb(179,102,249,1)";
+        console.log("live");
+    }
 }
 window.addEventListener("beforeunload", leaveChannel);
+camera.addEventListener("click", toggleCamera);
+mic.addEventListener("click",toggleMic);
 init();
