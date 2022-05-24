@@ -68,7 +68,22 @@ const init=async()=>{
 // handle user message sent event.
 const handleMessageFromPeer=async(message, MemberId)=>{
     message=JSON.parse(message.text);
-    console.log("message :", message);
+    // console.log("message :", message);
+    if(message.type=='offer'){
+        // create an answer
+        createAnswer(MemberId, message.offer)
+    }
+    if(message.type=='answer'){
+        // add an answer no member id needed. 
+        addAnswer(message.answer)
+    }
+
+    // both peers will send out candidates. add candidate to peer connection.
+    if(message.type==='candidate'){
+        if(peerConnection){
+            peerConnection.addIceCandidate(message.candidate)
+        }
+    }
 }
 
 // handle user joined event
@@ -134,5 +149,28 @@ let createOffer=async(MemberId)=>{
             console.log(error.message);
         })
     
+}
+
+// create answer function
+let createAnswer=async(MemberId, offer)=>{
+    await createPeerConnection(MemberId);
+    // remote description offer
+    await peerConnection.setRemoteDescription(offer);
+
+    // local description the answer for peer2.
+    const answer=await peerConnection.createAnswer();
+    await peerConnection.setLocalDescription(answer);
+
+    // send back the SDP to peer A.
+    client.sendMessageToPeer({text:JSON.stringify({'type':'answer', 'answer':answer})},MemberId);
+
+}
+
+// peerA adds the answer set by the peer B .
+let addAnswer=async(answer)=>{
+    // set remote desc of the peer A.
+    if(!peerConnection.currentRemoteDescription){
+        peerConnection.setRemoteDescription(answer);
+    }
 }
 init();
