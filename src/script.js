@@ -25,6 +25,7 @@ let queryString=window.location.search;
 let urlParams=new URLSearchParams(queryString);
 let roomId=urlParams.get("room");
 
+// redirect back to the login page.
 if(!roomId){
     window.location='lobby.html';
 }
@@ -48,7 +49,7 @@ const init=async()=>{
     await client.login({uid,token});
 
     // room id(channel) e.g index.html?room=1243432
-    channel=client.createChannel("main");
+    channel=client.createChannel(roomId);
     
     // join the channel.
     await channel.join();
